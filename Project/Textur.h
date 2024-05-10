@@ -15,9 +15,9 @@ struct Texture {
 	int w, h, rows, column, framex, framey, frametime;
 	SDL_Rect src, dst;
 };
-//Загружает текстуру из файла
+//Загружает текстуру из файла filename передается название в папке Texture
 Texture* ImageLoadTexture(SDL_Renderer* ren, const char* filename);
-//Считает нужно ли поменять кадр в анимации
+//Считает нужно ли поменять кадр в анимации speed - сколько кадров должно быть в секунл=ду
 void NextFrame(Texture* text, int dtime, int speed);
 //Обертка на RenderCopy
 void ImageRenderCopy(SDL_Renderer* ren, Texture* text);
