@@ -4,35 +4,40 @@ void Init(SDL_Window*& win, SDL_Renderer*& ren)
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING))
 	{
-		printf("Инициализация SDL прошла с ошибками:%s\n", SDL_GetError());
+		printf("РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ SDL РїСЂРѕС€Р»Р° СЃ РѕС€РёР±РєР°РјРё:%s\n", SDL_GetError());
 		exit(-1);
 	}
 
-	if (IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG) == 0)
-	{
-		printf("Инициализация SDL_Image прошла с ошибками:%s\n", SDL_GetError());
-		DeInit(win, ren, -2);
-	}
-
-	SDL_DisplayMode DM;
-	if (SDL_GetCurrentDisplayMode(0, &DM) != 0)
-	{
-		printf("Получение размера дисплея прошла с ошибками:%s\n", SDL_GetError());
-		DeInit(win, ren, -5);
-	}
-
-	win = SDL_CreateWindow("The best Vampire Survivors", 0, 0, DM.w, DM.h, SDL_WINDOW_SHOWN);
+	win = SDL_CreateWindow("The best Vampire Survivors", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIN_WIDTH, WIN_HEIGHT, SDL_WINDOW_SHOWN);
 	if (win == NULL)
 	{
-		printf("Ошибка создания окна:%s\n", SDL_GetError());
-		DeInit(win, ren, -3);
+		printf("РћС€РёР±РєР° СЃРѕР·РґР°РЅРёСЏ РѕРєРЅР°:%s\n", SDL_GetError());
+		DeInit(win, ren, -2);
 	}
 
 	ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
 	if (ren == NULL)
 	{
-		printf("Ошибка создания рендера:%s\n", SDL_GetError());
+		printf("РћС€РёР±РєР° СЃРѕР·РґР°РЅРёСЏ СЂРµРЅРґРµСЂР°:%s\n", SDL_GetError());
+		DeInit(win, ren, -3);
+	}
+
+	if (IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG) == 0)
+	{
+		printf("РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ SDL_Image РїСЂРѕС€Р»Р° СЃ РѕС€РёР±РєР°РјРё:%s\n", IMG_GetError());
 		DeInit(win, ren, -4);
+	}
+
+	if (Mix_OpenAudio(48000, AUDIO_U8, 1, 2048))
+	{
+		printf("РћС€РёР±РєР° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё Р°СѓРґРёРѕ СЃРёСЃС‚РµРјС‹: %s\n", Mix_GetError());
+		DeInit(win, ren, -5);
+	}
+
+	if (TTF_Init() != NULL)
+	{
+		printf("РћС€РёР±РєР° РёРЅРёС†РёР°Р»РёР·Р°С†РёРё ttf:%s\n", TTF_GetError());
+		DeInit(win, ren, -6);
 	}
 }
 
@@ -40,6 +45,8 @@ void DeInit(SDL_Window* win, SDL_Renderer* ren, int error)
 {
 	if (ren) SDL_DestroyRenderer(ren);
 	if (win) SDL_DestroyWindow(win);
+	TTF_Quit();
+	Mix_Quit();
 	IMG_Quit();
 	SDL_Quit();
 	exit(error);

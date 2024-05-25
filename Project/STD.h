@@ -3,14 +3,21 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <iostream>
+#include <SDL_mixer.h>
+#include "Text.h"
+#include "Button.h"
+#include "Textur.h"
 
-/*Инициализирует SDL*/
+#define WIN_WIDTH 1000
+#define WIN_HEIGHT 800
+
+/*РРЅРёС†РёР°Р»РёР·РёСЂСѓРµС‚ SDL*/
 void Init(SDL_Window*& win, SDL_Renderer*& ren);
-/*Деинициализирует SDL, принимает код ошибки*/
+/*Р”РµРёРЅРёС†РёР°Р»РёР·РёСЂСѓРµС‚ SDL, РїСЂРёРЅРёРјР°РµС‚ РєРѕРґ РѕС€РёР±РєРё*/
 void DeInit(SDL_Window* win, SDL_Renderer* ren, int error);
-/*Возвращает рандомное целое число от a до b*/
+/*Р’РѕР·РІСЂР°С‰Р°РµС‚ СЂР°РЅРґРѕРјРЅРѕРµ С†РµР»РѕРµ С‡РёСЃР»Рѕ РѕС‚ a РґРѕ b*/
 int random(int, int);
-/*Возвращает рандомное вещественное число от a, b*/
+/*Р’РѕР·РІСЂР°С‰Р°РµС‚ СЂР°РЅРґРѕРјРЅРѕРµ РІРµС‰РµСЃС‚РІРµРЅРЅРѕРµ С‡РёСЃР»Рѕ РѕС‚ a, b*/
 double randomd(double a, double b);
-/*Получет математические координаты coord, координаты центра отсчета coord0, маштаб scale и в переменную rez записывает координаты в окне*/
+/*РџРѕР»СѓС‡РµС‚ РјР°С‚РµРјР°С‚РёС‡РµСЃРєРёРµ РєРѕРѕСЂРґРёРЅР°С‚С‹ coord, РєРѕРѕСЂРґРёРЅР°С‚С‹ С†РµРЅС‚СЂР° РѕС‚СЃС‡РµС‚Р° coord0, РјР°С€С‚Р°Р± scale Рё РІ РїРµСЂРµРјРµРЅРЅСѓСЋ rez Р·Р°РїРёСЃС‹РІР°РµС‚ РєРѕРѕСЂРґРёРЅР°С‚С‹ РІ РѕРєРЅРµ*/
 void WinCoord(SDL_Point coord, SDL_Point coord0, double scale, SDL_Point& rez);

@@ -1,38 +1,50 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "Textur.h"
 
-#define FPS 60
-
-Texture* ImageLoadTexture(SDL_Renderer* ren, const char* filename)
+Textur* Textur_Load(SDL_Renderer* ren, const char* filename, SDL_Rect* dstrect)
 {
 	char s[256] = "Texture\\";
 	strcat(s, filename);
-	Texture* rez = (Texture*)malloc(sizeof(Texture));
+	Textur* rez = (Textur*)malloc(sizeof(Textur));
 	FILE* file = fopen(s, "r");
 	if (file == NULL)
 	{
-		printf("Îøèáêà îòêðûòèÿ ôàéëà:%s\n", s);
+		printf("ÐžÑˆÐ¸Ð±ÐºÐ° Ð¾Ñ‚ÐºÑ€Ñ‹Ñ‚Ð¸Ñ Ñ„Ð°Ð¹Ð»Ð°:%s\n", s);
 		exit(-1);
 	}
-	fscanf(file, "%d %d\n%d %d\n%s", &rez->column, &rez->rows, &rez->w, &rez->h, s + 8);
-	rez->dst = rez->src = { 0, 0, rez->w / rez->column, rez->h / rez->rows};
-	SDL_Surface* image = IMG_Load(s);
-	rez->text = SDL_CreateTextureFromSurface(ren, image);
-	if (rez->text == NULL)
-	{
-		printf("Îøèáêà çàãðóçêè òåêñòóð:%s\n", SDL_GetError());
-		exit(-1);
-	}
-	SDL_FreeSurface(image);
+	fscanf(file, "%d %d\n%d\n%s", &rez->column, &rez->rows, &rez->speed, s + 8);
 	fclose(file);
+
+	SDL_Surface* image = IMG_Load(s);
+	if (image == NULL)
+	{
+		printf("ÐžÑˆÐ¸Ð±ÐºÐ° Ð·Ð°Ð³Ñ€ÑƒÐ·ÐºÐ¸ Ñ‚ÐµÐºÑÑ‚ÑƒÑ€Ñ‹: %s\n", SDL_GetError());
+		exit(-1);
+	}
+	rez->text = SDL_CreateTextureFromSurface(ren, image);
+	if (image == NULL)
+	{
+		printf("ÐžÑˆÐ¸Ð±ÐºÐ° ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ Ñ‚ÐµÐºÑÑ‚ÑƒÑ€Ñ‹: %s\n", SDL_GetError());
+		exit(-1);
+	}
+
+	rez->w = image->w;
+	rez->h = image->h;
+	*rez->src = { 0, 0, rez->w / rez->column, rez->h / rez->rows};
+	if (dstrect)
+		*rez->dst = *rez->src;
+	else
+		*rez->dst = { dstrect->x, dstrect->y, rez->src->w, rez->src->h };
+	SDL_FreeSurface(image);
+
 	rez->framex = rez->framey = rez->frametime = 0;
 	return rez;
 }
 
-void NextFrame(Texture* text, int dtime, int speed)
+void Textur_NextFrame(Textur* text, int dtime)
 {
 	text->frametime += dtime;
-	if (text->frametime >= 1000 / speed)
+	if (text->frametime >= 1000 / text->speed)
 	{
 		text->framex++;
 		if (text->framex == text->column)
@@ -42,28 +54,25 @@ void NextFrame(Texture* text, int dtime, int speed)
 			if (text->framey == text->rows)
 				text->framey = 0;
 		}
-		text->src = { text->framex * text->w / text->column, text->framey * text->h / text->rows, text->src.w, text->src.h };
+		*text->src = { text->framex * text->w / text->column, text->framey * text->h / text->rows, text->src->w, text->src->h };
 		text->frametime = 0;
 	}
 }
 
-void ImageRenderCopy(SDL_Renderer* ren, Texture* text)
+void Textur_RenderCopy(SDL_Renderer* ren, Textur* text)
 {
-	if(SDL_RenderCopy(ren, text->text, &(text->src), &(text->dst)))
-		printf("Îøèáêà îòðèñîâêè:%s\n", SDL_GetError());
+	if(SDL_RenderCopy(ren, text->text, text->src, text->dst))
+		printf("ÐžÑˆÐ¸Ð±ÐºÐ° Ð¾Ñ‚Ñ€Ð¸ÑÐ¾Ð²ÐºÐ¸:%s\n", SDL_GetError());
 }
 
-void ImageRenderCopyExp(SDL_Renderer* ren, Texture* text, double angel, SDL_Point* center, SDL_RendererFlip flag)
+void Textur_RenderCopyExp(SDL_Renderer* ren, Textur* text, double angel, SDL_Point* center, SDL_RendererFlip flag)
 {
-	if (SDL_RenderCopyEx(ren, text->text, &(text->src), &(text->dst), angel, center, flag))
-		printf("Îøèáêà îòðèñîâêè:%s\n", SDL_GetError());
+	if (SDL_RenderCopyEx(ren, text->text, text->src, text->dst, angel, center, flag))
+		printf("ÐžÑˆÐ¸Ð±ÐºÐ° Ð¾Ñ‚Ñ€Ð¸ÑÐ¾Ð²ÐºÐ¸:%s\n", SDL_GetError());
 }
 
-void ImageFreeTexture(Texture* text)
+void Textur_Free(Textur* text)
 {
-	if(text != NULL)
-	{
-		SDL_DestroyTexture(text->text);
-		free(text);
-	}
+	SDL_DestroyTexture(text->text);
+	free(text);
 }

@@ -1,31 +1,32 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
-#include <iostream>
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
+#define _CRT_SECURE_NO_WARNINGS
 #include "STD.h"
-#include "Textur.h"
+
+#define FPS 60
+
+const Uint8* keyboard;
 
 SDL_Window* win = NULL;
 SDL_Renderer* ren = NULL;
 
 int SDL_main(int argc, char** argv)
 {
+	SDL_SetRenderDrawBlendMode(ren, SDL_BLENDMODE_BLEND);
 	system("chcp 1251>nul");
 	Init(win, ren);
-	Texture* image = ImageLoadTexture(ren, "text.text");
-	Texture* fire = ImageLoadTexture(ren, "fire.text");
-	fire->dst.x = 800;
-	fire->dst.y = 800;
-	SDL_Surface* surf = IMG_Load("Texture/bac.jpg");
-	SDL_Texture* background = SDL_CreateTextureFromSurface(ren, surf);
-	SDL_FreeSurface(surf);
 
-	const Uint8* keyboard = SDL_GetKeyboardState(NULL);
-	int newtime, oldtime = 0, deltime = 0;
-	bool desp = true;
+	TTF_Font* fond = TTF_OpenFont("Font/arial.ttf", 40);
+
+	//Запуск музыки
+	Mix_Music* music = Mix_LoadMUS("music.mp3");
+	Mix_PlayMusic(music, -1);
+
+	keyboard = SDL_GetKeyboardState(NULL);
+
+	int newtime, oldtime = 0, deltime = 0, frametime = 0;
+	int volume = 100;
 	bool run = true;
 	SDL_Event ev;
+	Textur* text = Textur_Load(ren, "text.text");
 
 	while (run)
 	{
@@ -35,41 +36,48 @@ int SDL_main(int argc, char** argv)
 			{
 			case SDL_QUIT:
 				run = false;
-			default:
 				break;
+			//case SDL_KEYDOWN:
+			//	switch (ev.key.keysym.scancode)
+			//	{
+			//	case SDL_SCANCODE_SPACE:
+			//	{
+			//		if (!Mix_PausedMusic())
+			//			Mix_PauseMusic();
+			//		else
+			//			Mix_ResumeMusic();
+			//	}
+			//	break;
+			//	case SDL_SCANCODE_KP_PLUS:
+			//		if (volume < 100) volume++;
+			//		break;
+			//	case SDL_SCANCODE_KP_MINUS:
+			//		if (volume > 0) volume--;
+			//		break;
+			//	}
 			}
 		}
 
+		//Подсчет времени
 		newtime = SDL_GetTicks();
 		deltime = newtime - oldtime;
 		oldtime = newtime;
+		frametime += deltime;
 
-		NextFrame(image, deltime, 1);
-		NextFrame(fire, deltime, 10);
+		Textur_NextFrame(text, deltime);
 
-		if (keyboard[SDL_SCANCODE_D] && !keyboard[SDL_SCANCODE_A])
+		//Установка громкости музыки
+		Mix_VolumeMusic(128 * volume / 100);
+
+		//Нужна ли отрисовка
+		if(frametime >= 1000 / FPS)
 		{
-			image->dst.x++;
-			desp = true;
+			Textur_RenderCopy(ren, text);
+			SDL_RenderPresent(ren);
+			frametime = 0;
 		}
-		if (!keyboard[SDL_SCANCODE_D] && keyboard[SDL_SCANCODE_A])
-		{
-			image->dst.x--;
-			desp = false;
-		}
-		if (keyboard[SDL_SCANCODE_W] && !keyboard[SDL_SCANCODE_S]) image->dst.y--;
-		if (!keyboard[SDL_SCANCODE_W] && keyboard[SDL_SCANCODE_S]) image->dst.y++;
-
-		SDL_RenderCopy(ren, background, NULL, NULL);
-		ImageRenderCopy(ren, fire);
-		if (desp)
-			ImageRenderCopyExp(ren, image, 0, NULL, SDL_FLIP_HORIZONTAL);
-		else
-			ImageRenderCopy(ren, image);
-		SDL_RenderPresent(ren);
 	}
-	ImageFreeTexture(image);
-	SDL_DestroyTexture(background);
+	Mix_FreeMusic(music);
 	DeInit(win, ren, 0);
 	return 0;
 }

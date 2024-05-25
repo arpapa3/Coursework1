@@ -4,24 +4,28 @@
 #include <SDL_image.h>
 
 /*
-	* text - ссылка на текстуру
-	* w, h - ширина и высота текстуры
-	* rows, column - количество кадров в одной строке и коллчиество строк
-	* src - область текстуры которую собираемся отрисвоать
-	* dst - область окна в которую нужно отрисовать структуру
+	* text - СЃСЃС‹Р»РєР° РЅР° С‚РµРєСЃС‚СѓСЂСѓ
+	* w, h - С€РёСЂРёРЅР° Рё РІС‹СЃРѕС‚Р° С‚РµРєСЃС‚СѓСЂС‹
+	* rows, column - РєРѕР»РёС‡РµСЃС‚РІРѕ РєР°РґСЂРѕРІ РІ РѕРґРЅРѕР№ СЃС‚СЂРѕРєРµ Рё РєРѕР»Р»С‡РёРµСЃС‚РІРѕ СЃС‚СЂРѕРє
+	* src - РѕР±Р»Р°СЃС‚СЊ С‚РµРєСЃС‚СѓСЂС‹ РєРѕС‚РѕСЂСѓСЋ СЃРѕР±РёСЂР°РµРјСЃСЏ РѕС‚СЂРёСЃРІРѕР°С‚СЊ
+	* dst - РѕР±Р»Р°СЃС‚СЊ РѕРєРЅР° РІ РєРѕС‚РѕСЂСѓСЋ РЅСѓР¶РЅРѕ РѕС‚СЂРёСЃРѕРІР°С‚СЊ СЃС‚СЂСѓРєС‚СѓСЂСѓ
+	* framex, framey - РєР°РґСЂ РїРѕ СЃС‡РµС‚Сѓ РІ СЃС‚РѕР»Р±С†Рµ Рё СЃС‚СЂРѕРєРµ
+	* frametime - РІСЂРµРјСЏ С‚РµРєСѓС‰РµРіРѕ РєР°РґСЂР°
+	* speed - СЃРєРѕСЂРѕСЃС‚СЊ СЃРјРµРЅС‹ РєР°РґСЂР° РІ РєР°РґСЂР°С… РІ СЃРµРєСѓРЅРґСѓ
 */
-struct Texture {
+struct Textur {
 	SDL_Texture* text;
-	int w, h, rows, column, framex, framey, frametime;
-	SDL_Rect src, dst;
+	int w, h, rows, column;
+	int framex, framey, frametime, speed;
+	SDL_Rect *src, *dst;
 };
-//Загружает текстуру из файла filename передается название в папке Texture
-Texture* ImageLoadTexture(SDL_Renderer* ren, const char* filename);
-//Считает нужно ли поменять кадр в анимации speed - сколько кадров должно быть в секунл=ду
-void NextFrame(Texture* text, int dtime, int speed);
-//Обертка на RenderCopy
-void ImageRenderCopy(SDL_Renderer* ren, Texture* text);
-//Обертка на RenderCopyExp
-void ImageRenderCopyExp(SDL_Renderer* ren, Texture* text, double angel, SDL_Point* center, SDL_RendererFlip flag);
-//Удаляет текстуру
-void ImageFreeTexture(Texture* text);
+//Р—Р°РіСЂСѓР¶Р°РµС‚ С‚РµРєСЃС‚СѓСЂСѓ РёР· С„Р°Р№Р»Р° filename РїРµСЂРµРґР°РµС‚СЃСЏ РЅР°Р·РІР°РЅРёРµ РІ РїР°РїРєРµ Texture
+Textur* Textur_Load(SDL_Renderer* ren, const char* filename);
+//РЎС‡РёС‚Р°РµС‚ РЅСѓР¶РЅРѕ Р»Рё РїРѕРјРµРЅСЏС‚СЊ РєР°РґСЂ РІ Р°РЅРёРјР°С†РёРё speed - СЃРєРѕР»СЊРєРѕ РєР°РґСЂРѕРІ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РІ СЃРµРєСѓРЅР»=РґСѓ
+void Textur_NextFrame(Textur* text, int dtime);
+//РћР±РµСЂС‚РєР° РЅР° RenderCopy
+void Textur_RenderCopy(SDL_Renderer* ren, Textur* text);
+//РћР±РµСЂС‚РєР° РЅР° RenderCopyExp
+void Textur_RenderCopyExp(SDL_Renderer* ren, Textur* text, double angel, SDL_Point* center, SDL_RendererFlip flag);
+//РЈРґР°Р»СЏРµС‚ С‚РµРєСЃС‚СѓСЂСѓ
+void Textur_Free(Textur* text);
